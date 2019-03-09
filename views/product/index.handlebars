@@ -1,14 +1,14 @@
 <h1>Products</h1>
 
 {{#each products}}
-    <div class="card card-body mb-2">
-        <h4>{{prodName}}</h4>
-        <p>{{itemNo}}</p>
-        <a href="/product/edit/{{id}}" class="btn btn-dark btn-block mb-2">Edit</a>
-        <form method="POST" action="/product/{{id}}?_method=DELETE">
-            <input type="submit" class="btn btn-danger btn-block" value="Delete">
-        </form>
-    </div>
+<div class="card card-body mb-2">
+    <h4>{{prodName}}</h4>
+    <p>{{itemNo}}</p>
+    <a href="/product/edit/{{id}}" class="btn btn-dark btn-block mb-2">Edit</a>
+    <form method="POST" action="/product/{{id}}?_method=DELETE">
+        <input type="submit" class="btn btn-danger btn-block" value="Delete">
+    </form>
+</div>
 {{else}}
-    <p>No products found!</p>
+<p>No products found!</p>
 {{/each}}
