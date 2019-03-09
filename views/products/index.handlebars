@@ -4,8 +4,8 @@
 <div class="card card-body mb-2">
     <h4>{{prodName}}</h4>
     <p>{{itemNo}}</p>
-    <a href="/product/edit/{{id}}" class="btn btn-dark btn-block mb-2">Edit</a>
-    <form method="POST" action="/product/{{id}}?_method=DELETE">
+    <a href="/products/edit/{{id}}" class="btn btn-dark btn-block mb-2">Edit</a>
+    <form method="POST" action="/products/{{id}}?_method=DELETE">
         <input type="submit" class="btn btn-danger btn-block" value="Delete">
     </form>
 </div>

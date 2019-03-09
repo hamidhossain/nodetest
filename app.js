@@ -3,6 +3,8 @@ const exphbs  = require('express-handlebars');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
+const flash = require('connect-flash');
+const session = require('express-session');
 
 const app = express();
 
@@ -27,6 +29,24 @@ app.use(bodyParser.json());
 // Method override middleware
 app.use(methodOverride('_method'));
 
+// Express session middleware
+app.use(session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true
+}));
+
+app.use(flash());
+
+// Global variables
+app.use(function(req, res, next){
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    res.locals.error = req.flash('error');
+
+    next();
+});
+
 // Routes
 app.get('/', (req, res) => {
     const title = "Index Title";
@@ -38,26 +58,29 @@ app.get('/about', (req, res) => {
     res.render('about');
 });
 
-app.get('/product', (req, res) => {
+// Product list
+app.get('/products', (req, res) => {
     Product.find({})
         .sort({ date: 'desc' })
         .then(products => {
-            res.render('product/index', {
+            res.render('products/index', {
                 products: products
             });
         });
 })
 
-app.get('/product/add', (req, res) => {
-    res.render('product/add');
+// Product add form
+app.get('/products/add', (req, res) => {
+    res.render('products/add');
 });
 
-app.get('/product/edit/:id', (req, res) => {
+// Product edit form
+app.get('/products/edit/:id', (req, res) => {
     Product.findOne({
         _id: req.params.id
     })
     .then(product => {
-        res.render('product/edit', {
+        res.render('products/edit', {
             product
         });
 
@@ -65,7 +88,8 @@ app.get('/product/edit/:id', (req, res) => {
     
 });
 
-app.post('/product', (req, res) => {
+// Product add process
+app.post('/products', (req, res) => {
     let errors = [];
 
     if (!req.body.itemNo) {
@@ -77,7 +101,7 @@ app.post('/product', (req, res) => {
     }
 
     if (errors.length > 0) {
-        res.render('product/add', {
+        res.render('products/add', {
             errors: errors,
             itemNo: req.body.itemNo,
             prodName: req.body.prodName
@@ -91,13 +115,15 @@ app.post('/product', (req, res) => {
         new Product(req.body)
             .save()
             .then(product => {
-                res.redirect('/product');
+                req.flash('success_msg', 'Product added successfully.');
+                res.redirect('/products');
             });
     }
     
 });
 
-app.put('/product/:id', (req, res) => {
+// Product edit process
+app.put('/products/:id', (req, res) => {
     Product.findOne({
         _id: req.params.id
     }).then(product => {
@@ -105,16 +131,19 @@ app.put('/product/:id', (req, res) => {
         product.prodName = req.body.prodName;
         product.save()
             .then(product => {
-                res.redirect('/product');
+                req.flash('success_msg', 'Product updated successfully.');
+                res.redirect('/products');
             });
     })    
 });
 
-app.delete('/product/:id', (req, res) => {
+// Product delete
+app.delete('/products/:id', (req, res) => {
     Product.deleteOne({ 
         _id: req.params.id
     }).then(() => {
-        res.redirect('/product');
+        req.flash('success_msg', 'Product deleted successfully.');
+        res.redirect('/products');
     });
 });
 
