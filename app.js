@@ -44,6 +44,10 @@ app.use(session({
     saveUninitialized: true
 }));
 
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use(flash());
 
 // Global variables
@@ -52,6 +56,8 @@ app.use(function(req, res, next){
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
 
+    // this can be used now everywhere, such in navbar
+    res.locals.user = req.user || null;
     next();
 });
 
