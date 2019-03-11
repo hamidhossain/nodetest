@@ -2,12 +2,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 
+// Load helper
+const {ensureAuthenticated} = require('../helper/auth');
+
 // Load product schema
 require('../models/Product');
 const Product = mongoose.model('product');
 
 // Product list
-router.get('/', (req, res) => {
+router.get('/', ensureAuthenticated, (req, res) => {
     Product.find({})
         .sort({ date: 'desc' })
         .then(products => {
@@ -18,12 +21,12 @@ router.get('/', (req, res) => {
 })
 
 // Product add form
-router.get('/add', (req, res) => {
+router.get('/add', ensureAuthenticated, (req, res) => {
     res.render('products/add');
 });
 
 // Product edit form
-router.get('/edit/:id', (req, res) => {
+router.get('/edit/:id', ensureAuthenticated, (req, res) => {
     Product.findOne({
         _id: req.params.id
     })
@@ -35,7 +38,7 @@ router.get('/edit/:id', (req, res) => {
 });
 
 // Product add process
-router.post('/', (req, res) => {
+router.post('/', ensureAuthenticated, (req, res) => {
     let errors = [];
 
     if (!req.body.itemNo) {
@@ -68,7 +71,7 @@ router.post('/', (req, res) => {
 });
 
 // Product edit process
-router.put('/:id', (req, res) => {
+router.put('/:id', ensureAuthenticated, (req, res) => {
     Product.findOne({
         _id: req.params.id
     }).then(product => {
@@ -83,7 +86,7 @@ router.put('/:id', (req, res) => {
 });
 
 // Product delete
-router.delete('/:id', (req, res) => {
+router.delete('/:id', ensureAuthenticated, (req, res) => {
     Product.deleteOne({ 
         _id: req.params.id
     }).then(() => {
