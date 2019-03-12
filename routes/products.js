@@ -11,7 +11,8 @@ const Product = mongoose.model('product');
 
 // Product list
 router.get('/', ensureAuthenticated, (req, res) => {
-    Product.find({})
+    // bring only current user's products
+    Product.find({ user: req.user.id })
         .sort({ date: 'desc' })
         .then(products => {
             res.render('products/index', {
@@ -31,9 +32,15 @@ router.get('/edit/:id', ensureAuthenticated, (req, res) => {
         _id: req.params.id
     })
     .then(product => {
-        res.render('products/edit', {
-            product
-        });
+        // restrict edit to the owner only
+        if (product.user != req.user.id) {
+            req.flash('error_msg', 'Not authorized');
+            res.redirect('/products');
+        } else {
+            res.render('products/edit', {
+                product
+            });
+        }
     });  
 });
 
@@ -58,15 +65,16 @@ router.post('/', ensureAuthenticated, (req, res) => {
     } else {
         const newProduct = {
             itemNo: req.body.itemNo,
-            prodName: req.body.prodName
+            prodName: req.body.prodName,
+            user: req.user.id
         }
 
-        new Product(req.body)
+        new Product(newProduct)
             .save()
             .then(product => {
                 req.flash('success_msg', 'Product added successfully.');
                 res.redirect('/products');
-            });
+            })
     }
 });
 
