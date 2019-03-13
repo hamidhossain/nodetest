@@ -17,9 +17,12 @@ const users = require('./routes/users');
 // Passport config
 require('./config/passport')(passport);
 
+// Db config
+const db = require('./config/database');
+
 // Connect to mongodb
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost/TestDB", { useNewUrlParser: true })
+mongoose.connect(db.mongoURI, { useNewUrlParser: true })
     .then(()=> console.log('MongoDb connected'))
     .catch(err => console.log(err));
 
@@ -75,7 +78,8 @@ app.get('/about', (req, res) => {
 app.use('/products', products);
 app.use('/users', users);
 
-const port = 5000;
+// to get the default port from Heroku or 5000
+const port = process.env.PORT || 5000;
 
 app.listen(port, () => {
     console.log(`Server started on ${port}`);
